@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para Você, Com Amor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/typed.js@2.0.12"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Dancing+Script:wght@700&display=swap');
+        
+        body {
+            font-family: 'JetBrains Mono', monospace;
+            background-color: #0f0e17;
+            color: #fffffe;
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+        
+        .handwriting {
+            font-family: 'Dancing Script', cursive;
+        }
+        
+        .section {
+            min-height: 100vh;
+            padding: 4rem 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .bg-dark-purple {
+            background-color: #1a1a2e;
+        }
+        
+        .bg-deep-blue {
+            background-color: #16213e;
+        }
+        
+        .polaroid {
+            background: white;
+            padding: 1rem 1rem 3rem;
+            transform: rotate(var(--r, -3deg));
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .polaroid:hover {
+            transform: rotate(0deg) scale(1.05);
+            z-index: 10;
+        }
+        
+        .polaroid:after {
+            content: attr(data-caption);
+            position: absolute;
+            bottom: 1rem;
+            left: 0;
+            right: 0;
+            text-align: center;
+            color: #000;
+            font-size: 0.9rem;
+        }
+        
+        .fade-in-item {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+        
+        .fade-in-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(138, 43, 226, 0.6);
+            pointer-events: none;
+        }
+        
+        .glitch {
+            position: relative;
+        }
+        
+        .glitch::before, .glitch::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: inherit;
+        }
+        
+        .glitch::before {
+            left: 2px;
+            text-shadow: -2px 0 #ff00ff;
+            clip: rect(24px, 550px, 90px, 0);
+            animation: glitch-anim 2s infinite linear alternate-reverse;
+        }
+        
+        .glitch::after {
+            left: -2px;
+            text-shadow: -2px 0 #00ffff;
+            clip: rect(85px, 550px, 140px, 0);
+            animation: glitch-anim2 2s infinite linear alternate-reverse;
+        }
+        
+        @keyframes glitch-anim {
+            0% { clip: rect(31px, 9999px, 94px, 0); }
+            10% { clip: rect(112px, 9999px, 76px, 0); }
+            20% { clip: rect(85px, 9999px, 77px, 0); }
+            30% { clip: rect(27px, 9999px, 97px, 0); }
+            40% { clip: rect(64px, 9999px, 98px, 0); }
+            50% { clip: rect(61px, 9999px, 85px, 0); }
+            60% { clip: rect(99px, 9999px, 114px, 0); }
+            70% { clip: rect(34px, 9999px, 115px, 0); }
+            80% { clip: rect(98px, 9999px, 129px, 0); }
+            90% { clip: rect(43px, 9999px, 96px, 0); }
+            100% { clip: rect(82px, 9999px, 64px, 0); }
+        }
+        
+        @keyframes glitch-anim2 {
+            0% { clip: rect(65px, 9999px, 119px, 0); }
+            10% { clip: rect(144px, 9999px, 142px, 0); }
+            20% { clip: rect(62px, 9999px, 180px, 0); }
+            30% { clip: rect(33px, 9999px, 55px, 0); }
+            40% { clip: rect(147px, 9999px, 82px, 0); }
+            50% { clip: rect(159px, 9999px, 124px, 0); }
+            60% { clip: rect(161px, 9999px, 109px, 0); }
+            70% { clip: rect(85px, 9999px, 85px, 0); }
+            80% { clip: rect(162px, 9999px, 108px, 0); }
+            90% { clip: rect(138px, 9999px, 126px, 0); }
+            100% { clip: rect(63px, 9999px, 106px, 0); }
+        }
+        
+        .slide-in {
+            opacity: 0;
+            transform: translateX(-100px);
+            transition: all 0.6s ease-out;
+        }
+        
+        .slide-in.active {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        .audio-player {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="relative">
+    <!-- Floating particles -->
+    <div id="particles-container"></div>
+    
+    <!-- Navigation dots -->
+    <div class="fixed right-6 top-1/2 transform -translate-y-1/2 z-50 hidden md:block">
+        <div class="flex flex-col space-y-4">
+            <a href="#intro" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+            <a href="#beginning" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+            <a href="#moments" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+            <a href="#learned" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+            <a href="#message" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+            <a href="#last" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+            <a href="#final" class="nav-dot w-3 h-3 rounded-full border border-purple-500 transition-all duration-300"></a>
+        </div>
+    </div>
+    
+    <!-- Intro section -->
+    <section id="intro" class="section flex items-center justify-center bg-gradient-to-br from-black to-purple-900 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-30" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'); background-size: cover; background-position: center;"></div>
+        
+        <div class="relative z-10 container mx-auto px-4 text-center max-w-3xl">
+            <div class="mb-8">
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 text-purple-300 glitch" data-text="Última Carta">
+                    <span>Última Carta</span>
+                </h1>
+                <div class="w-full h-1 bg-gradient-to-r from-transparent via-purple-500 to-transparent mx-auto my-6"></div>
+            </div>
+            
+            <p id="typewriter" class="text-xl md:text-2xl leading-relaxed mb-12 text-purple-100 min-h-40"></p>
+            
+            <div class="animate-bounce mt-16">
+                <a href="#beginning" class="text-purple-300 hover:text-white transition-colors">
+                    <i class="fas fa-chevron-down text-3xl"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+    
+    <!-- How it all began -->
+    <section id="beginning" class="section bg-dark-purple flex items-center">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-col md:flex-row items-center gap-12">
+                <div class="md:w-1/2 slide-in">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-8 text-purple-300 flex items-center">
+                        <span class="mr-4"><i class="fas fa-heart"></i></span>
+                        <span>Como Tudo Começou</span>
+                    </h2>
+                    
+                    <div class="prose prose-invert text-lg">
+                        <p class="mb-6">Lembro como se fosse hoje da primeira vez que te vi. Você chegou tímida, com aquele sorriso que iluminava o cômodo inteiro, e eu sabia que ali estava alguém especial.</p>
+                        <p class="mb-6">Nossas conversas fluíam naturalmente, como se nos conhecêssemos há anos. Cada risada, cada olhar trocado, cada segundo ao seu lado confirmava o que meu coração já sabia desde o início.</p>
+                        <p class="handwriting text-2xl text-purple-200">"Você foi a pessoa que me fez acreditar em destino sem nem precisar tentar."</p>
+                    </div>
+                </div>
+                
+                <div class="md:w-1/2 slide-in">
+                    <div class="relative">
+                        <div class="absolute inset-0 bg-purple-500 rounded-2xl opacity-20 -rotate-6"></div>
+                        <div class="relative bg-black bg-opacity-50 rounded-2xl overflow-hidden border border-purple-900">
+                            <div class="aspect-w-16 aspect-h-9">
+                                <div style="background-image: url('https://images.unsplash.com/photo-1529333164850-2c13da48e6aa?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80'); background-size: cover; background-position: center; min-height: 300px;"></div>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="text-xl font-bold mb-2 text-purple-300">Nosso Primeiro Encontro</h3>
+                                <p class="text-gray-300">Um momento que mudaria tudo, sem que nenhum de nós soubesse...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Our Moments -->
+    <section id="moments" class="section bg-deep-blue">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-5xl font-bold mb-8 text-center text-purple-300">
+                <span class="mr-4"><i class="fas fa-images"></i></span>
+                <span>Nossos Momentos</span>
+            </h2>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-16">
+                <!-- Polaroid style gallery -->
+                <div class="polaroid" data-caption="Nosso primeiro passeio ❤️" style="--r: -3deg;">
+                    <img src="https://images.unsplash.com/photo-1518199266791-5375a83190b7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Our moment" class="w-full h-64 object-cover">
+                </div>
+                
+                <div class="polaroid" data-caption="Aquele dia perfeito ✨" style="--r: 2deg;">
+                    <img src="https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1469&q=80" alt="Our moment" class="w-full h-64 object-cover">
+                </div>
+                
+                <div class="polaroid" data-caption="Sorrindo juntos 😊" style="--r: -5deg;">
+                    <img src="https://images.unsplash.com/photo-1494774157365-9e04c6720e47?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Our moment" class="w-full h-64 object-cover">
+                </div>
+                
+                <div class="polaroid" data-caption="Aquele café ☕" style="--r: 1deg;">
+                    <img src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Our moment" class="w-full h-64 object-cover">
+                </div>
+                
+                <div class="polaroid" data-caption="Noite estrelada 🌠" style="--r: 4deg;">
+                    <img src="https://images.unsplash.com/photo-1566737236500-c8ac43014a67?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80" alt="Our moment" class="w-full h-64 object-cover">
+                </div>
+                
+                <div class="polaroid" data-caption="Sempre juntos ❤️" style="--r: -2deg;">
+                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1376&q=80" alt="Our moment" class="w-full h-64 object-cover">
+                </div>
+            </div>
+            
+            <p class="text-center mt-16 text-xl text-purple-200 max-w-3xl mx-auto">
+                "Cada momento com você se tornou uma memória preciosa. Mesmo os dias mais simples ganhavam cores especiais quando estávamos juntos."
+            </p>
+        </div>
+    </section>
+    
+    <!-- What I learned -->
+    <section id="learned" class="section bg-dark-purple flex items-center">
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl md:text-5xl font-bold mb-8 text-center text-purple-300">
+                <span class="mr-4"><i class="fas fa-lightbulb"></i></span>
+                <span>O Que Aprendi Com Você</span>
+            </h2>
+            
+            <div class="max-w-2xl mx-auto mt-16 space-y-8">
+                <div class="fade-in-item p-6 bg-black bg-opacity-30 rounded-xl border-l-4 border-purple-500">
+                    <p class="text-xl">Você me ensinou que o amor não é apenas sobre grandes gestos, mas sobre os pequenos detalhes do cotidiano.</p>
+                </div>
+                
+                <div class="fade-in-item p-6 bg-black bg-opacity-30 rounded-xl border-l-4 border-purple-500">
+                    <p class="text-xl">Mostrou-me que a verdadeira força vem da vulnerabilidade e da coragem de ser quem realmente somos.</p>
+                </div>
+                
+                <div class="fade-in-item p-6 bg-black bg-opacity-30 rounded-xl border-l-4 border-purple-500">
+                    <p class="text-xl">Revelou que o tempo não se mede apenas em horas e minutos, mas em momentos que valem a pena lembrar.</p>
+                </div>
+                
+                <div class="fade-in-item p-6 bg-black bg-opacity-30 rounded-xl border-l-4 border-purple-500">
+                    <p class="text-xl">Me ensinou que às vezes, o silêncio compartilhado pode dizer mais que mil palavras.</p>
+                </div>
+                
+                <div class="fade-in-item p-6 bg-black bg-opacity-30 rounded-xl border-l-4 border-purple-500">
+                    <p class="text-xl">Mostrou-me que o verdadeiro amor não é possessivo, mas libertador - mesmo quando dói deixar ir.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- If I could tell you something -->
+    <section id="message" class="section bg-gradient-to-b from-blue-950 to-purple-900 flex items-center">
+        <div class="container mx-auto px-4 text-center max-w-4xl">
+            <div class="relative">
+                <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg blur opacity-25"></div>
+                <div class="relative px-8 py-12 bg-black bg-opacity-80 rounded-lg">
+                    <h2 class="text-3xl md:text-5xl font-bold mb-8 text-purple-300">
+                        <span class="mr-4"><i class="fas fa-comment-dots"></i></span>
+                        <span>Se Eu Pudesse Te Dizer Algo Agora</span>
+                    </h2>
+                    
+                    <div class="text-lg md:text-xl leading-relaxed space-y-6 text-left">
+                        <p>Eu diria que não me arrependo de um único segundo ao seu lado. Cada risada, cada lágrima, cada silêncio e cada conversa até o amanhecer valeram a pena.</p>
+                        
+                        <p class="handwriting text-2xl text-purple-200 text-center">"Você foi meu melhor capítulo."</p>
+                        
+                        <p>Eu guardarei você não com tristeza, mas com gratidão. Por ter cruzado meu caminho, por ter compartilhado sua luz, por ter me mostrado um amor que eu nem sabia que existia.</p>
+                        
+                        <p>Se tem uma coisa que eu nunca vou esquecer é como você fez meu coração bater mais rápido apenas com um sorriso. Como o mundo parecia mais bonito quando eu via através dos seus olhos.</p>
+                        
+                        <p>Obrigado. Por tudo. Pelos dias bons, pelos dias ruins, pelo amor, pelas lições, pelas memórias. Você sempre terá um pedaço do meu coração.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Last slide with music -->
+    <section id="last" class="section bg-deep-blue flex items-center justify-center">
+        <div class="container mx-auto px-4 text-center max-w-2xl">
+            <h2 class="text-3xl md:text-4xl font-bold mb-12 text-purple-300">
+                Antes de Você Ir...
+            </h2>
+            
+            <div class="audio-player p-6 rounded-xl border border-purple-700 bg-black bg-opacity-50 max-w-md mx-auto">
+                <button id="play-btn" class="bg-purple-600 hover:bg-purple-500 text-white font-bold py-3 px-8 rounded-full text-lg transition-all flex items-center mx-auto">
+                    <i class="fas fa-play mr-3"></i>
+                    <span>Ouça Isso Antes de Ir</span>
+                </button>
+                
+                <div id="player-controls" class="mt-6 hidden">
+                    <audio id="song" controls class="w-full">
+                        <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mpeg">
+                        Seu navegador não suporta o elemento de áudio.
+                    </audio>
+                </div>
+                
+                <p class="mt-6 text-purple-200">* Esta música sempre me lembrará de você</p>
+            </div>
+        </div>
+    </section>
+    
+    <!-- Final farewell -->
+    <section id="final" class="section bg-black flex items-center justify-center relative overflow-hidden">
+        <div class="absolute inset-0 flex items-center justify-center">
+            <div class="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-80 z-10"></div>
+            <div class="absolute inset-0 opacity-20" style="background-image: url('https://images.unsplash.com/photo-1519681393784-d120267933ba?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80'); background-size: cover; background-position: center;"></div>
+        </div>
+        
+        <div class="relative z-20 container mx-auto px-4 max-w-4xl">
+            <div class="bg-black bg-opacity-80 border border-purple-900 rounded-xl p-8">
+                <h2 class="text-3xl md:text-5xl font-bold mb-8 text-center text-purple-300">
+                    Minha Última Palavra Para Você
+                </h2>
+                
+                <div id="final-letter" class="prose prose-invert text-lg leading-relaxed min-h-80 mx-auto"></div>
+                
+                <div id="signature" class="mt-12 opacity-0 text-right">
+                    <div class="handwriting text-4xl text-purple-300 mb-1" id="type-name"></div>
+                    <div class="text-purple-400" id="type-date"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <script>
+        // Typewriter effect for intro
+        document.addEventListener('DOMContentLoaded', function() {
+            const typewriter = document.getElementById('typewriter');
+            
+            if (typewriter) {
+                new Typed('#typewriter', {
+                    strings: [
+                        'Esta é a última carta que escrevo para você...^1000\n\nUma forma de fechar esse capítulo com o mesmo cuidado e amor com que foi escrito.^1500\n\nPor favor, leia até o final. Há coisas que preciso que você saiba...'
+                    ],
+                    typeSpeed: 40,
+                    backSpeed: 0,
+                    showCursor: true,
+                    cursorChar: '|',
+                    smartBackspace: false,
+                    loop: false
+                });
+            }
+            
+            // Typewriter for final letter
+            const finalLetter = document.getElementById('final-letter');
+            
+            if (finalLetter) {
+                setTimeout(() => {
+                    new Typed('#final-letter', {
+                        strings: [
+                            'Querida,^500\n\nSe você está lendo isso, significa que nosso tempo juntos chegou ao fim.^1000\n\nQuero que saiba que você foi uma das pessoas mais importantes da minha vida.^1200 Nosso amor foi real, intenso e transformador.^1000\n\nNão escrevo isso para te prender ou fazer você mudar de ideia.^1000 Escrevo porque você merece saber o impacto que teve em mim.^1500\n\nObrigado por ter me ensinado tanto. Por me mostrar o que é amar sem medo.^1000 Por me fazer sorrir nos dias em que achava que era impossível.^1000\n\nDesejo toda felicidade do mundo para você.^1000 Que encontre alguém que te ame como você merece.^1500\n\nCom todo meu amor,^2000'
+                        ],
+                        typeSpeed: 30,
+                        backSpeed: 0,
+                        showCursor: true,
+                        cursorChar: '|',
+                        onComplete: function() {
+                            setTimeout(() => {
+                                document.getElementById('signature').style.opacity = '1';
+                                
+                                new Typed('#type-name', {
+                                    strings: ['Seu amor de sempre'],
+                                    typeSpeed: 40,
+                                    showCursor: false
+                                });
+                                
+                                setTimeout(() => {
+                                    new Typed('#type-date', {
+                                        strings: [new Date().toLocaleDateString('pt-BR', { day: 'numeric', month: 'long', year: 'numeric' })],
+                                        typeSpeed: 40,
+                                        showCursor: false
+                                    });
+                                }, 800);
+                                
+                            }, 1000);
+                        }
+                    });
+                }, 1000);
+            }
+            
+            // Music player
+            const playBtn = document.getElementById('play-btn');
+            const playerControls = document.getElementById('player-controls');
+            const song = document.getElementById('song');
+            
+            if (playBtn) {
+                playBtn.addEventListener('click', function() {
+                    playBtn.classList.add('hidden');
+                    playerControls.classList.remove('hidden');
+                    song.play();
+                });
+            }
+            
+            // Scroll animations
+            const fadeInItems = document.querySelectorAll('.fade-in-item');
+            const slideInItems = document.querySelectorAll('.slide-in');
+            
+            function checkPosition() {
+                for (let i = 0; i < fadeInItems.length; i++) {
+                    const item = fadeInItems[i];
+                    const positionFromTop = item.getBoundingClientRect().top;
+                    
+                    if (positionFromTop - window.innerHeight <= -100) {
+                        item.classList.add('visible');
+                    }
+                }
+                
+                for (let i = 0; i < slideInItems.length; i++) {
+                    const item = slideInItems[i];
+                    const positionFromTop = item.getBoundingClientRect().top;
+                    
+                    if (positionFromTop - window.innerHeight <= -50) {
+                        item.classList.add('active');
+                    }
+                }
+            }
+            
+            window.addEventListener('scroll', checkPosition);
+            checkPosition();
+            
+            // Navigation dots highlight
+            const sections = document.querySelectorAll('section');
+            const navDots = document.querySelectorAll('.nav-dot');
+            
+            function highlightNav() {
+                let current = '';
+                
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    
+                    if (pageYOffset >= (sectionTop - sectionHeight / 3)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+                
+                navDots.forEach(dot => {
+                    dot.classList.remove('bg-purple-500');
+                    dot.classList.add('border');
+                    
+                    if (dot.getAttribute('href') === `#${current}`) {
+                        dot.classList.add('bg-purple-500');
+                        dot.classList.remove('border');
+                        dot.classList.add('transform', 'scale-125');
+                    } else {
+                        dot.classList.remove('transform', 'scale-125');
+                    }
+                });
+            }
+            
+            window.addEventListener('scroll', highlightNav);
+            highlightNav();
+            
+            // Create floating particles
+            const particlesContainer = document.getElementById('particles-container');
+            
+            if (particlesContainer) {
+                function createParticle() {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    
+                    // Random position and size
+                    const size = Math.random() * 5 + 1;
+                    const posX = Math.random() * window.innerWidth;
+                    const posY = Math.random() * window.innerHeight;
+                    
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.left = `${posX}px`;
+                    particle.style.top = `${posY}px`;
+                    
+                    // Random opacity and animation duration
+                    const opacity = Math.random() * 0.8 + 0.2;
+                    const duration = Math.random() * 10 + 5;
+                    
+                    particle.style.opacity = opacity;
+                    particle.style.animation = `float ${duration}s linear infinite`;
+                    
+                    particlesContainer.appendChild(particle);
+                    
+                    // Remove particle after animation ends to prevent DOM overload
+                    setTimeout(() => {
+                        particle.remove();
+                    }, duration * 1000);
+                }
+                
+                // Create multiple particles
+                for (let i = 0; i < 50; i++) {
+                    createParticle();
+                }
+                
+                // Continuously create particles
+                setInterval(createParticle, 1000);
+            }
+            
+            // Add floating animation to CSS
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes float {
+                    0% {
+                        transform: translateY(0) translateX(0);
+                        opacity: 1;
+                    }
+                    100% {
+                        transform: translateY(-100vh) translateX(20px);
+                        opacity: 0;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
+</body>
+</html>
